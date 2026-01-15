@@ -1,0 +1,17 @@
+[
+  { "id": 1, "name": "Malayalam", "iso": "ml" },
+  { "id": 2, "name": "Hindi", "iso": "hi" },
+  { "id": 3, "name": "English", "iso": "en" },
+  { "id": 4, "name": "Japanese", "iso": "ja" },
+  { "id": 5, "name": "Tamil", "iso": "ta" },
+  { "id": 6, "name": "Telugu", "iso": "te" },
+  { "id": 7, "name": "Kannada", "iso": "kn" },
+  { "id": 8, "name": "Korean", "iso": "ko" },
+  { "id": 9, "name": "Chinese", "iso": "zh" },
+  { "id": 10, "name": "French", "iso": "fr" },
+  { "id": 11, "name": "Spanish", "iso": "es" },
+  { "id": 12, "name": "Russian", "iso": "ru" },
+  { "id": 13, "name": "Portuguese", "iso": "pt" },
+  { "id": 14, "name": "Italian", "iso": "it" },
+  { "id": 15, "name": "Arabic", "iso": "ar" }
+]

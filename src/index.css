@@ -1,0 +1,109 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.slick-slide > div {
+  margin-right: 10px;
+}
+.slick-slider > button {
+  display: none !important;
+}
+/* .slick-slider > button:hover {
+  visibility: visible;
+} */
+.slick-dots li button:before {
+  color: rgb(187, 187, 187);
+}
+.slick-dots li button:active {
+  color: rgb(224, 224, 224);
+}
+
+.hide::-webkit-scrollbar {
+  width: 20px;
+}
+.scroll {
+  overflow-y: hidden;
+}
+.hide {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+/* Track */
+::-webkit-scrollbar-track {
+  background: #000000;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #b01818;
+  /* border-radius: 10px; */
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+.spinner {
+  margin: auto;
+  width: 50px;
+  height: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 3px;
+}
+
+.spinner > div {
+  background: #195fd2;
+  height: 100%;
+  width: 2px;
+  float: left;
+  margin: 0 1px;
+  animation: stretch 2s infinite;
+  animation-timing-function: cubic-bezier(0.62, 0.28, 0.23, 0.99);
+}
+
+.spinner .r1 {
+  animation-delay: -1s;
+}
+
+.spinner .r2 {
+  animation-delay: -0.9s;
+}
+
+.spinner .r3 {
+  animation-delay: -0.8s;
+}
+
+.spinner .r4 {
+  animation-delay: -0.7s;
+}
+
+.spinner .r5 {
+  animation-delay: -0.6s;
+}
+
+@keyframes stretch {
+  0%,
+  20%,
+  49% {
+    transform: scaleY(0.4);
+    background-color: #195fd2;
+  }
+
+  10% {
+    transform: scaleY(1);
+  }
+
+  50%,
+  70%,
+  100% {
+    transform: scaleY(0.4);
+    background-color: red;
+  }
+
+  60% {
+    transform: scaleY(1);
+    background-color: red;
+  }
+}

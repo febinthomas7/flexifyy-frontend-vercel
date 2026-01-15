@@ -1,0 +1,17 @@
+[
+  { "id": 1, "name": "India", "iso": "IN" },
+  { "id": 2, "name": "United States", "iso": "US" },
+  { "id": 3, "name": "Japan", "iso": "JP" },
+  { "id": 4, "name": "South Korea", "iso": "KR" },
+  { "id": 5, "name": "China", "iso": "CN" },
+  { "id": 6, "name": "France", "iso": "FR" },
+  { "id": 7, "name": "United Kingdom", "iso": "GB" },
+  { "id": 8, "name": "Germany", "iso": "DE" },
+  { "id": 9, "name": "Italy", "iso": "IT" },
+  { "id": 10, "name": "Australia", "iso": "AU" },
+  { "id": 11, "name": "Canada", "iso": "CA" },
+  { "id": 12, "name": "Brazil", "iso": "BR" },
+  { "id": 13, "name": "Russia", "iso": "RU" },
+  { "id": 14, "name": "Mexico", "iso": "MX" },
+  { "id": 15, "name": "Spain", "iso": "ES" }
+]
