@@ -1,163 +1,58 @@
 import React, { createContext, useState, useEffect } from "react";
-import { io } from "socket.io-client";
+import { getSocket } from "./socket"; // Singleton
 import { handleSuccess } from "./utils";
 
 export const MessagingContext = createContext();
 
 export const MessagingProvider = ({ children }) => {
-  const [socket, setSocket] = useState(null);
   const [online, setOnline] = useState([]);
   const [messages, setMessages] = useState([]);
-  const [auth, setAuth] = useState(false); // Default to not authenticated
+  const [auth, setAuth] = useState(false);
   const [users, setUsers] = useState();
   const userId = localStorage.getItem("userId");
 
-  // Authenticate user
+  // Authenticate user once
   useEffect(() => {
     const authenticate = async () => {
-      const userId = localStorage.getItem("userId");
       const token = localStorage.getItem("token");
-      if (!userId || !token) return; // Skip if no user is logged in
+      if (!userId || !token) return;
 
       try {
-        const url = `${
-          import.meta.env.VITE_BASE_URL
-        }/auth/check-auth?userId=${userId}`;
-        const headers = {
-          Authorization: token,
-        };
-        const response = await fetch(url, { headers });
-
-        const result = await response.json();
-        if (result.success) {
-          setAuth(true); // User is authenticated
-        } else {
-          // If authentication fails, clear localStorage and handle socket cleanup
-          await fetch(`${import.meta.env.VITE_BASE_URL}/auth/device-logout`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          });
-          localStorage.clear();
-          setAuth(false); // User is no longer authenticated
-
-          // Cleanup socket if it exists
-          if (socket) {
-            socket.disconnect();
-            setSocket(null); // Reset socket state
-          }
-        }
-      } catch (error) {
-        console.error("Authentication error:", error);
-
-        // Handle socket cleanup on error as well
-        if (socket) {
-          socket.disconnect();
-          setSocket(null);
-        }
+        const res = await fetch(
+          `${import.meta.env.VITE_BASE_URL}/auth/check-auth?userId=${userId}`,
+          { headers: { Authorization: token } }
+        );
+        const result = await res.json();
+        setAuth(result.success);
+      } catch (err) {
+        console.error(err);
+        setAuth(false);
       }
     };
-
     authenticate();
-  }, [auth]);
+  }, []); // 🔹 run only once on mount
 
-  // Initialize socket connection
+  // Initialize socket once
   useEffect(() => {
     if (!auth || !userId) return;
 
-    if (!socket) {
-      const newSocket = io(import.meta.env.VITE_BASE_URL, {
-        query: { userId },
-      });
+    const socket = getSocket(userId);
 
-      setSocket(newSocket);
+    socket.on("getOnlineUser", setOnline);
+    socket.on("newMessage", (msg) => {
+      setMessages((prev) => [...prev, msg]);
+      handleSuccess(`Message from ${msg.senderName}`);
+    });
 
-      newSocket.on("getOnlineUser", (onlineUsers) => {
-        setOnline(onlineUsers);
-      });
-
-      return () => {
-        newSocket.disconnect();
-        setSocket(null); // Reset the socket state on unmount
-      };
-    }
-
-    // If socket already exists, no new connection is created
     return () => {
-      if (!auth || !userId) {
-        socket?.disconnect();
-        setSocket(null);
-      }
+      // Optional: disconnect only if you want on unmount
+      // socket.disconnect();
     };
   }, [auth]);
 
-  // Handle incoming messages
-  useEffect(() => {
-    if (!socket) return;
-    // console.log(socket);
-
-    const handleNewMessage = (newMessage) => {
-      if (
-        newMessage?.senderId === localStorage.getItem("receiverId") &&
-        newMessage?.receiverId === localStorage.getItem("userId")
-      ) {
-        setMessages((prevMessages) => [...prevMessages, newMessage]);
-      }
-
-      const audio = new Audio("/notification.mp3");
-      audio.play();
-
-      handleSuccess(`message from ${newMessage.senderName}`);
-    };
-
-    const handleNewChat = (newMessage) => {
-      updateUserMessages(newMessage);
-    };
-
-    const handleChat = (newMessage) => {
-      updateUserMessages(newMessage);
-      setMessages((prevMessages) => [...prevMessages, newMessage]);
-    };
-
-    socket.on("newMessage", handleNewMessage);
-    socket.on("newChat", handleNewChat);
-    socket.on("newMessageReceived", handleChat);
-
-    return () => {
-      socket.off("newMessage", handleNewMessage);
-      socket.off("newChat", handleNewChat);
-      socket.off("newMessageReceived", handleChat);
-    };
-  }, [socket]);
-
-  const updateUserMessages = (newMessage) => {
-    setUsers((prevUsers) =>
-      prevUsers?.map((user) => ({
-        ...user,
-        newMessage: [
-          ...user?.newMessage?.filter(
-            (msg) => msg?._id !== newMessage?._id // Prevent duplicate messages
-          ),
-          newMessage,
-        ],
-      }))
-    );
-  };
-
   return (
     <MessagingContext.Provider
-      value={{
-        socket,
-        setSocket,
-        online,
-        messages,
-        setMessages,
-        auth,
-        setAuth,
-        users,
-        setUsers,
-      }}
+      value={{ online, messages, auth, users, setUsers, setAuth }}
     >
       {children}
     </MessagingContext.Provider>

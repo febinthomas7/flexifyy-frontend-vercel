@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useContext, useMemo } from "react";
+import { useState, useEffect, useRef, useContext, useMemo } from "react";
 import { RiArrowLeftSLine } from "react-icons/ri";
 import Header from "../../components/Header";
 import { PiCamera } from "react-icons/pi";
@@ -10,6 +10,7 @@ import {
   LoadingComponentForchatUsers,
   LoadingComponentForchatMessages,
 } from "../../components/LoadingComponent";
+import { getSocket } from "../../socket";
 import { ToastContainer } from "react-toastify";
 const MessagingPage = () => {
   const [message, setMessage] = useState("");
@@ -25,8 +26,10 @@ const MessagingPage = () => {
   const [updateFriend, setUpdateFriend] = useState(false);
   const [photo, setPhoto] = useState("");
 
-  const { messages, setMessages, online, users, setUsers, socket } =
+  const { messages, setMessages, online, users, setUsers } =
     useContext(MessagingContext);
+  const socket = getSocket(localStorage.getItem("userId"));
+
   const no_image = "/no_image.svg";
   const userData = async () => {
     setLoading(true);
