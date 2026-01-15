@@ -1,11 +1,11 @@
-import React, { createContext, useState, useEffect } from "react";
-import { getSocket, disconnectSocket } from "./socket";
+import { createContext, useState, useEffect, useRef } from "react";
+import { io } from "socket.io-client";
 import { handleSuccess } from "./utils";
 
 export const MessagingContext = createContext();
 
 export const MessagingProvider = ({ children }) => {
-  const [socket, setSocket] = useState(null);
+  const socketRef = useRef(null); // 🔥 IMPORTANT
   const [online, setOnline] = useState([]);
   const [messages, setMessages] = useState([]);
   const [auth, setAuth] = useState(false);
@@ -13,81 +13,109 @@ export const MessagingProvider = ({ children }) => {
 
   const userId = localStorage.getItem("userId");
 
-  // 🔐 AUTH CHECK (run once)
+  // 🔐 AUTH CHECK (RUN ONCE)
   useEffect(() => {
     const authenticate = async () => {
       const token = localStorage.getItem("token");
       if (!userId || !token) return;
 
       try {
-        const res = await fetch(
+        const response = await fetch(
           `${import.meta.env.VITE_BASE_URL}/auth/check-auth?userId=${userId}`,
           { headers: { Authorization: token } }
         );
-        const result = await res.json();
+        const result = await response.json();
         setAuth(result.success);
-      } catch (err) {
-        console.error("Auth error:", err);
+      } catch (error) {
+        console.error("Auth error:", error);
         setAuth(false);
       }
     };
 
     authenticate();
-  }, []);
+  }, []); // ✅ removed auth dependency
 
-  // 🔌 SOCKET INIT (only once after auth)
+  // 🔌 SOCKET INIT (ONCE AFTER AUTH)
   useEffect(() => {
-    if (!auth || !userId) return;
+    if (!auth || !userId || socketRef.current) return;
 
-    const sock = getSocket(userId);
-    setSocket(sock);
-
-    sock.on("getOnlineUser", (users) => {
-      setOnline(users);
+    const socket = io(import.meta.env.VITE_BASE_RENDER_URL, {
+      query: { userId },
+      transports: ["websocket"],
     });
 
-    sock.on("newMessageReceived", (msg) => {
-      setMessages((prev) => [...prev, msg]);
-      handleSuccess(`Message from ${msg.senderName}`);
-    });
+    socketRef.current = socket;
 
-    sock.on("newChat", (chat) => {
-      setUsers((prev) =>
-        prev?.map((u) =>
-          u._id === chat._id ? { ...u, newMessage: [...u.newMessage, chat] } : u
-        )
-      );
-    });
+    socket.on("getOnlineUser", setOnline);
+
+    socket.on("newMessage", handleNewMessage);
+    socket.on("newChat", handleNewChat);
+    socket.on("newMessageReceived", handleChat);
 
     return () => {
-      // ❌ DO NOT auto disconnect (prevents reconnect loop)
-      sock.off("getOnlineUser");
-      sock.off("newMessageReceived");
-      sock.off("newChat");
+      socket.off("getOnlineUser");
+      socket.off("newMessage", handleNewMessage);
+      socket.off("newChat", handleNewChat);
+      socket.off("newMessageReceived", handleChat);
+      // ❌ DO NOT DISCONNECT HERE
     };
   }, [auth]);
 
-  // 🔒 LOGOUT CLEANUP (important)
+  // 🔒 DISCONNECT ONLY ON LOGOUT
   useEffect(() => {
-    if (!auth) {
-      disconnectSocket();
-      setSocket(null);
+    if (!auth && socketRef.current) {
+      socketRef.current.disconnect();
+      socketRef.current = null;
       setMessages([]);
       setOnline([]);
     }
   }, [auth]);
 
+  // 🔔 HANDLERS (same logic as before)
+  const handleNewMessage = (newMessage) => {
+    if (
+      newMessage?.senderId === localStorage.getItem("receiverId") &&
+      newMessage?.receiverId === localStorage.getItem("userId")
+    ) {
+      setMessages((prev) => [...prev, newMessage]);
+    }
+
+    new Audio("/notification.mp3").play();
+    handleSuccess(`message from ${newMessage.senderName}`);
+  };
+
+  const handleNewChat = (newMessage) => {
+    updateUserMessages(newMessage);
+  };
+
+  const handleChat = (newMessage) => {
+    updateUserMessages(newMessage);
+    setMessages((prev) => [...prev, newMessage]);
+  };
+
+  const updateUserMessages = (newMessage) => {
+    setUsers((prevUsers) =>
+      prevUsers?.map((user) => ({
+        ...user,
+        newMessage: [
+          ...user?.newMessage?.filter((msg) => msg?._id !== newMessage?._id),
+          newMessage,
+        ],
+      }))
+    );
+  };
+
   return (
     <MessagingContext.Provider
       value={{
-        socket,
+        socket: socketRef.current,
         online,
         messages,
         setMessages,
-        users,
-        setUsers,
         auth,
         setAuth,
+        users,
+        setUsers,
       }}
     >
       {children}

@@ -10,7 +10,6 @@ import {
   LoadingComponentForchatUsers,
   LoadingComponentForchatMessages,
 } from "../../components/LoadingComponent";
-import { getSocket } from "../../socket";
 import { ToastContainer } from "react-toastify";
 const MessagingPage = () => {
   const [message, setMessage] = useState("");
