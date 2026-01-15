@@ -45,7 +45,7 @@ const Card = ({ movie, type, MoreInfo, mode, page }) => {
     setUserContinueList,
   } = useContext(Watch);
   const len = movie?.vote_average;
-  const shareUrl = `https://flexifyy.netlify.app/${type || mode}/${
+  const shareUrl = `https://flexifyy.vercel.app/${type || mode}/${
     movie?.id || movie?.link_url
   }`;
 
