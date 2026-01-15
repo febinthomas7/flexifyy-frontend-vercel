@@ -35,7 +35,7 @@ const MessagingPage = () => {
     setLoading(true);
     try {
       const url = `${
-        import.meta.env.VITE_BASE_URL
+        import.meta.env.VITE_BASE_RENDER_URL
       }/chat/getusers?id=${localStorage.getItem("userId")}`;
       const response = await fetch(url, {
         method: "GET",
@@ -76,7 +76,9 @@ const MessagingPage = () => {
 
   const selectUser = async (userId) => {
     try {
-      const url = `${import.meta.env.VITE_BASE_URL}/chat/user?id=${userId}`;
+      const url = `${
+        import.meta.env.VITE_BASE_RENDER_URL
+      }/chat/user?id=${userId}`;
       const response = await fetch(url, {
         method: "GET",
         headers: {
@@ -122,7 +124,7 @@ const MessagingPage = () => {
     );
     formData.append("userId", localStorage.getItem("userId"));
 
-    fetch(`${import.meta.env.VITE_BASE_URL}/chat/sendmessage`, {
+    fetch(`${import.meta.env.VITE_BASE_RENDER_URL}/chat/sendmessage`, {
       method: "POST",
       body: formData,
     })
@@ -162,7 +164,7 @@ const MessagingPage = () => {
     setChatLoading(true);
     try {
       const url = `${
-        import.meta.env.VITE_BASE_URL
+        import.meta.env.VITE_BASE_RENDER_URL
       }/chat/getmessage?receiverId=${
         receiverId || localStorage.getItem("receiverId")
       }&senderId=${localStorage.getItem("userId")}`;
