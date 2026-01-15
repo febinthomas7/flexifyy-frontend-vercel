@@ -1,17 +1,19 @@
 import React, { createContext, useState, useEffect } from "react";
-import { getSocket } from "./socket"; // Singleton
+import { getSocket, disconnectSocket } from "./socket";
 import { handleSuccess } from "./utils";
 
 export const MessagingContext = createContext();
 
 export const MessagingProvider = ({ children }) => {
+  const [socket, setSocket] = useState(null);
   const [online, setOnline] = useState([]);
   const [messages, setMessages] = useState([]);
   const [auth, setAuth] = useState(false);
-  const [users, setUsers] = useState();
+  const [users, setUsers] = useState([]);
+
   const userId = localStorage.getItem("userId");
 
-  // Authenticate user once
+  // 🔐 AUTH CHECK (run once)
   useEffect(() => {
     const authenticate = async () => {
       const token = localStorage.getItem("token");
@@ -25,34 +27,68 @@ export const MessagingProvider = ({ children }) => {
         const result = await res.json();
         setAuth(result.success);
       } catch (err) {
-        console.error(err);
+        console.error("Auth error:", err);
         setAuth(false);
       }
     };
-    authenticate();
-  }, []); // 🔹 run only once on mount
 
-  // Initialize socket once
+    authenticate();
+  }, []);
+
+  // 🔌 SOCKET INIT (only once after auth)
   useEffect(() => {
     if (!auth || !userId) return;
 
-    const socket = getSocket(userId);
+    const sock = getSocket(userId);
+    setSocket(sock);
 
-    socket.on("getOnlineUser", setOnline);
-    socket.on("newMessage", (msg) => {
+    sock.on("getOnlineUser", (users) => {
+      setOnline(users);
+    });
+
+    sock.on("newMessageReceived", (msg) => {
       setMessages((prev) => [...prev, msg]);
       handleSuccess(`Message from ${msg.senderName}`);
     });
 
+    sock.on("newChat", (chat) => {
+      setUsers((prev) =>
+        prev?.map((u) =>
+          u._id === chat._id ? { ...u, newMessage: [...u.newMessage, chat] } : u
+        )
+      );
+    });
+
     return () => {
-      // Optional: disconnect only if you want on unmount
-      // socket.disconnect();
+      // ❌ DO NOT auto disconnect (prevents reconnect loop)
+      sock.off("getOnlineUser");
+      sock.off("newMessageReceived");
+      sock.off("newChat");
     };
+  }, [auth]);
+
+  // 🔒 LOGOUT CLEANUP (important)
+  useEffect(() => {
+    if (!auth) {
+      disconnectSocket();
+      setSocket(null);
+      setMessages([]);
+      setOnline([]);
+    }
   }, [auth]);
 
   return (
     <MessagingContext.Provider
-      value={{ online, messages, auth, users, setUsers, setAuth }}
+      value={{
+        socket,
+        online,
+        messages,
+        setMessages,
+        users,
+        setUsers,
+        auth,
+        setAuth,
+      }}
     >
       {children}
     </MessagingContext.Provider>

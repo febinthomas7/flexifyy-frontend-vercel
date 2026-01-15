@@ -26,9 +26,8 @@ const MessagingPage = () => {
   const [updateFriend, setUpdateFriend] = useState(false);
   const [photo, setPhoto] = useState("");
 
-  const { messages, setMessages, online, users, setUsers } =
+  const { messages, setMessages, online, users, setUsers, socket } =
     useContext(MessagingContext);
-  const socket = getSocket(localStorage.getItem("userId"));
 
   const no_image = "/no_image.svg";
   const userData = async () => {
