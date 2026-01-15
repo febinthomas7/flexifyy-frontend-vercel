@@ -5,7 +5,7 @@ let socket;
 
 export const getSocket = (userId) => {
   if (!socket && userId) {
-    socket = io(import.meta.env.VITE_BASE_URL, {
+    socket = io(import.meta.env.VITE_BASE_RENDER_URL, {
       query: { userId },
       transports: ["websocket"],
       autoConnect: true,
