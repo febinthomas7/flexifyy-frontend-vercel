@@ -45,7 +45,7 @@ const Card = ({ movie, type, MoreInfo, mode, page }) => {
     setUserContinueList,
   } = useContext(Watch);
   const len = movie?.vote_average;
-  const shareUrl = `https://flexifyy.vercel.app/${type || mode}/${
+  const shareUrl = `${import.meta.env.VITE_BASE_URL}/${type || mode}/${
     movie?.id || movie?.link_url
   }`;
 
@@ -77,28 +77,13 @@ const Card = ({ movie, type, MoreInfo, mode, page }) => {
 
     const movieExists = Array.isArray(arr)
       ? arr?.some((element) =>
-          element.id ? element.id === movie.id : element.title === movie.title
+          element.id ? element.id === movie.id : element.title === movie.title,
         )
       : false;
 
     setList(movieExists);
     setMovieAdded(false);
   }, [movie, movieAdded, userList, userContinueList]);
-  // useEffect(() => {
-  //   likes();
-  // }, []);
-
-  // useEffect(() => {
-  //   const likeExist = Array.isArray(userlike)
-  //     ? userlike.some((element) =>
-  //         element.id ? element.id === movie.id : element.title === movie.title
-  //       )
-  //     : false;
-
-  //   setLike(likeExist);
-  // }, [userlike]);
-
-  // console.log(list);
 
   const watch = (m1, m2, m3, m4, m5) => {
     Watching(movie, type, mode, userContinueList, setUserContinueList);
@@ -221,7 +206,7 @@ const Card = ({ movie, type, MoreInfo, mode, page }) => {
                       type,
                       mode,
                       movie.id,
-                      movie?.embed_url?.split("anime/")[1]
+                      movie?.embed_url?.split("anime/")[1],
                     )
                   }
                   className="w-full h-7 capitalize text-[13px] hover:scale-105 duration-75 outline outline-2 outline-[#292929] outline-offset-1 ease-in bg-[#000000e8] rounded text-white"
@@ -316,7 +301,7 @@ const Card = ({ movie, type, MoreInfo, mode, page }) => {
                         navigation(
                           `/${movie?.media_type || type}?genre=${e}&language=${
                             movie?.original_language
-                          }`
+                          }`,
                         )
                       }
                       className="before:content-['.'] text-[10px] drop-shadow-lg hover:text-[#c0c0c0]"
