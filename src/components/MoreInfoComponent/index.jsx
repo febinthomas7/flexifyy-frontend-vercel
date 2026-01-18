@@ -148,7 +148,7 @@ const MoreInfoComponent = ({
       ? userList.some((element) =>
           element.id
             ? element.id === moreInfoData.id
-            : element.title === moreInfoData.title
+            : element.title === moreInfoData.title,
         )
       : false;
 
@@ -162,7 +162,7 @@ const MoreInfoComponent = ({
         type ||
         moreInfoData?.type ||
         moreInfoData?.mode
-      }`
+      }`,
     );
     document.body.classList.remove("scroll");
   };
@@ -170,7 +170,7 @@ const MoreInfoComponent = ({
     userData(setLoading, setUsers);
     setOpen(true);
   };
-  const shareUrl = `https://flexifyy.netlify.app/${type || mode}/${
+  const shareUrl = `${import.meta.env.VITE_BASE_URL}/${type || mode}/${
     moreInfoData?.id || moreInfoData?.link_url
   }`;
 
@@ -235,7 +235,7 @@ const MoreInfoComponent = ({
                       type,
                       moreInfoData?.type,
                       moreInfoData?.mode,
-                      moreInfoData?.id
+                      moreInfoData?.id,
                     )
                   }
                   type="button"

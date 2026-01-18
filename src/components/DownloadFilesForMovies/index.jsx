@@ -10,7 +10,7 @@ const DownloadFilesForMovies = ({ id }) => {
       try {
         const response = await axios.get(
           `${import.meta.env.VITE_BASE_URL}/api/download/movie`,
-          { params: { id } }
+          { params: { id } },
         );
         setFiles(response.data);
       } catch (err) {
@@ -56,8 +56,9 @@ const DownloadFilesForMovies = ({ id }) => {
                     key={index}
                     onClick={(e) => e.stopPropagation()}
                   >
-                    <a href={e.url}>{e.quality}</a>
-                    <span className="uppercase">.{e?.type}</span>
+                    <a href={e.url}>
+                      {e.quality} <span className="uppercase">.{e?.type}</span>
+                    </a>
                   </div>
                 );
               })}
