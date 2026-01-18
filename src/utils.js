@@ -51,7 +51,7 @@ export const getDeviceDetails = async () => {
 
       const state = data.region.replace(
         /(National Capital Territory of|State of|Union Territory of)\s*/,
-        ""
+        "",
       );
       return {
         state: state || "Unknown State",
@@ -106,7 +106,7 @@ export const add = async (
   mode,
   userList,
   setUserList,
-  setAdded
+  setAdded,
 ) => {
   setAdded(true);
   try {
@@ -149,7 +149,7 @@ export const Watching = async (
   type,
   mode,
   userContinueList,
-  setUserContinueList
+  setUserContinueList,
 ) => {
   try {
     const url = `${import.meta.env.VITE_BASE_URL}/auth/continue`;
@@ -194,7 +194,7 @@ export const deleteMovie = async (movie, userList, setUserList) => {
     if (success) {
       if (Array.isArray(userList)) {
         const updatedUserList = userList.filter(
-          (item) => item._id !== movie._id
+          (item) => item._id !== movie._id,
         );
         setUserList(updatedUserList);
         localStorage.setItem("userList", JSON.stringify(updatedUserList));
@@ -213,7 +213,7 @@ export const deleteMovie = async (movie, userList, setUserList) => {
 export const deleteContinue = async (
   movie,
   userContinueList,
-  setUserContinueList
+  setUserContinueList,
 ) => {
   try {
     const url = `${import.meta.env.VITE_BASE_URL}/auth/deleteContinue`;
@@ -230,7 +230,7 @@ export const deleteContinue = async (
     if (success) {
       if (Array.isArray(userContinueList)) {
         const updatedUserList = userContinueList.filter(
-          (item) => item._id !== movie._id
+          (item) => item._id !== movie._id,
         );
         setUserContinueList(updatedUserList);
       } else {
@@ -249,7 +249,7 @@ export const userData = async (setLoading, setUsers) => {
   setLoading(true);
   try {
     const url = `${
-      import.meta.env.VITE_BASE_URL
+      import.meta.env.VITE_BASE_RENDER_URL
     }/chat/getusers?id=${localStorage.getItem("userId")}`;
     const response = await fetch(url, {
       method: "GET",
@@ -270,7 +270,7 @@ export const userData = async (setLoading, setUsers) => {
 export const Message = async (userId, userName, movie, type, mode) => {
   try {
     const response = await fetch(
-      `${import.meta.env.VITE_BASE_URL}/chat/share`,
+      `${import.meta.env.VITE_BASE_RENDER_URL}/chat/share`,
       {
         method: "POST",
         body: JSON.stringify({
@@ -287,7 +287,7 @@ export const Message = async (userId, userName, movie, type, mode) => {
         headers: {
           "Content-Type": "application/json",
         },
-      }
+      },
     );
 
     const result = await response.json();
