@@ -4,7 +4,7 @@ import { Helmet } from "react-helmet";
 import { ToastContainer } from "react-toastify";
 import { useState, useEffect } from "react";
 import { IoReorderThreeOutline } from "react-icons/io5";
-import { RxCross1 } from "react-icons/rx";
+import { RxCross1, RxDoubleArrowUp, RxDoubleArrowDown } from "react-icons/rx";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { FaPlay } from "react-icons/fa";
 import { FaPause } from "react-icons/fa";
@@ -38,6 +38,8 @@ const SeriesDetails = () => {
 
   const [server, setServer] = useState(servers[0]?.url);
   const [isOpen, setIsOpen] = useState(false);
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+
   const fetchMovieById = async (id) => {
     const res = await fetch(
       `${import.meta.env.VITE_BASE_URL}/api/single/series?id=${id}`,
@@ -130,50 +132,64 @@ const SeriesDetails = () => {
       </div>
       <div onClick={() => setIsOpen(!isOpen)}>
         {isOpen ? (
-          ""
+          <RxCross1 className="text-white absolute right-5 sm:right-10 top-10 text-[35px] sm:text-[40px] cursor-pointer" />
         ) : (
           <IoReorderThreeOutline className="text-white absolute right-5 sm:right-10 top-10 text-[35px] sm:text-[40px] cursor-pointer" />
         )}
       </div>
+      {isOpen && (
+        <div className="absolute right-5 bg-[#000000] top-20 z-10 w-[250px] p-4 shadow-2xl rounded-md  overflow-hidden">
+          <h2 className="text-white font-bold text-sm ">Select Server</h2>
+          <ul className="flex flex-col list-disc">
+            {servers?.map((item, index) => (
+              <li
+                key={index}
+                title={item.name}
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    setServer(item.url);
+                  }
+                }}
+                className={`flex items-center w-full h-10 p-2 cursor-pointer ${
+                  item.url === server
+                    ? "bg-blue-500 text-white"
+                    : "text-gray-400"
+                } hover:bg-gray-700 transition duration-200`}
+                onClick={() => setServer(item.url)}
+              >
+                {item.name}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
       <div
-        className={`absolute right-0 bg-black z-10 w-[650px] p-4 shadow-2xl rounded-md h-full overflow-auto
+        className={`absolute bottom-0 bg-black z-10 w-full shadow-2xl rounded-md h-full
     transition-transform duration-300 ease-out
-    ${isOpen ? "translate-x-0" : "translate-x-full"}
+    ${isDetailsOpen ? "translate-y-0" : "translate-y-[96%]"}
   `}
       >
         {" "}
-        <div onClick={() => setIsOpen(!isOpen)}>
-          <RxCross1 className="text-white absolute pb-4 right-3 sm:right-10 top-5 text-[35px] sm:text-[40px] cursor-pointer" />
+        <div
+          onClick={() => setIsDetailsOpen(!isDetailsOpen)}
+          className="flex justify-center bg-[#940000] w-full items-center z-10  absolute top-0"
+        >
+          {isDetailsOpen ? (
+            <RxDoubleArrowDown className="text-white p-2  text-[35px] sm:text-[40px] cursor-pointer" />
+          ) : (
+            <RxDoubleArrowUp className="text-white  p-2  text-[35px] sm:text-[40px] cursor-pointer" />
+          )}
         </div>
-        <h2 className="text-white font-bold text-lg mb-5">Select Server</h2>
-        <ul className="flex flex-col list-disc">
-          {servers?.map((item, index) => (
-            <li
-              key={index}
-              title={item.name}
-              tabIndex={0}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  setServer(item.url);
-                }
-              }}
-              className={`flex items-center w-full h-10 p-2 cursor-pointer ${
-                item.url === server ? "bg-blue-500 text-white" : "text-gray-400"
-              } hover:bg-gray-700 transition duration-200`}
-              onClick={() => setServer(item.url)}
-            >
-              {item.name}
-            </li>
-          ))}
-        </ul>
-        <div className="h-full w-full  mt-4">
+        <div className="h-full w-full pt-16 p-4 overflow-auto">
           <div className="  flex flex-col gap-6  overflow-hidden  bg-[#000000f4] rounded  relative">
             <div className="w-full h-[420px] relative ">
               {data?.thumbnail ||
               (mode || type || data?.media_type || data?.mode || data?.type) ==
                 "anime" ? (
                 <img
-                  className="w-full h-full object-cover blur-[2px]"
+                  className="w-full h-full object-cover "
                   id="backdrop"
                   onError={(e) => {
                     e.target.src = "/fallback_bg.png";
@@ -183,7 +199,7 @@ const SeriesDetails = () => {
                 />
               ) : (
                 <img
-                  className="w-full h-full object-cover blur-[2px]"
+                  className="w-full h-full object-cover "
                   id="backdrop"
                   onError={(e) => {
                     e.target.src = "/fallback_bg.png";
@@ -262,6 +278,8 @@ const SeriesDetails = () => {
                 {data?.overview}
               </p>
             </div>
+            {(data?.media_type || data?.mode || data?.type || mode || type) ==
+              "movie" && <DownloadFilesForMovies id={data?.id} />}
 
             {credits?.cast.length != 0 && !data?.thumbnail ? (
               <ScrollForCastAndCrew
