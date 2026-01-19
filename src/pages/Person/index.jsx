@@ -2,11 +2,12 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet";
 import ScrollComponent from "../../components/ScrollComponent";
-import Header from "../../components/Header";
 import axios from "axios";
 import Footer from "../../components/Footer";
 import { ToastContainer } from "react-toastify";
 import { HiOutlineArrowSmallLeft } from "react-icons/hi2";
+import { LoadingComponentForMovieAndSeries } from "../../components/LoadingComponent";
+import Card from "../../components/Card";
 
 const Person = () => {
   const { id } = useParams();
@@ -23,8 +24,8 @@ const Person = () => {
   };
   const [personDetails, setPersonDetails] = useState([]);
   const [cast, setCaste] = useState();
-  const [crews, setCrews] = useState();
   const [loading, setLoading] = useState(false);
+  const [showAll, setShowAll] = useState(false);
 
   useEffect(() => {
     document.body.classList.remove("scroll");
@@ -63,31 +64,12 @@ const Person = () => {
       .then((response) => {
         setLoading(false);
         setCaste(response.data.cast);
-        setCrews(response.data.crew);
       })
       .catch(function (error) {
         console.error(error);
       });
   }, [id]);
-  useEffect(() => {
-    setLoading(true);
-    const options = {
-      method: "GET",
-      url: `${import.meta.env.VITE_BASE_URL}/api/actors`,
-      params: {
-        id: "1",
-      },
-    };
 
-    axios
-      .request(options)
-      .then((response) => {
-        setLoading(false);
-      })
-      .catch(function (error) {
-        console.error(error);
-      });
-  }, [id]);
   return (
     <div className="bg-black">
       <Helmet>
@@ -139,8 +121,8 @@ const Person = () => {
                     {personDetails?.gender == "2"
                       ? "Male"
                       : personDetails?.gender == "1"
-                      ? "Female"
-                      : "Non-binary"}
+                        ? "Female"
+                        : "Non-binary"}
                   </p>
                   <p>
                     <strong>Born: </strong>
@@ -164,15 +146,42 @@ const Person = () => {
         </div>
       </div>
 
-      <div className="mt-8">
-        <ScrollComponent data={cast} heading={"Cast"} loading={loading} />
-        {cast?.length <= 0 && <div className="w-full h-[180px]"></div>}
+      <div className="w-full h-full flex flex-col items-center py-20">
+        <div className="flex flex-wrap text-sm text-white gap-4 sm:gap-8 justify-center">
+          {loading ? (
+            <LoadingComponentForMovieAndSeries />
+          ) : (
+            (showAll ? cast : cast?.slice(0, 15))?.map((movie, index) => (
+              <Card
+                key={index}
+                movie={movie}
+                type={movie?.media_type}
+                mode={movie?.media_type}
+                MoreInfo={(e) => MoreInfo(e, movie)}
+              />
+            ))
+          )}
+        </div>
+
+        {cast?.length > 15 && !showAll && (
+          <button
+            onClick={() => setShowAll(true)}
+            className="mt-8 px-6 py-2 text-white rounded-md bg-red-600 hover:bg-red-700 transition"
+          >
+            Show more
+          </button>
+        )}
+
+        {showAll && (
+          <button
+            onClick={() => setShowAll(false)}
+            className="mt-8 px-6 py-2 text-white rounded-md bg-red-600 hover:bg-red-700 transition"
+          >
+            Show less
+          </button>
+        )}
       </div>
 
-      <div className="mt-8">
-        <ScrollComponent data={crews} heading={"Crew"} loading={loading} />
-        {crews?.length <= 0 && <div className="w-full h-[180px]"></div>}
-      </div>
       <Footer />
     </div>
   );

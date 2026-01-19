@@ -29,7 +29,7 @@ const Actors = () => {
 
   const fetchMovies = (page = 1) =>
     fetch(`${import.meta.env.VITE_BASE_URL}/api/actors?page=${page}`).then(
-      (res) => res.json()
+      (res) => res.json(),
     );
 
   const { data, isFetching } = useQuery({
@@ -83,10 +83,10 @@ const Actors = () => {
 
         {data?.results.length <= 0 && (
           <div className="flex flex-col items-center justify-center min-h-screen bg-black text-white">
-            <h2 className="text-4xl font-semibold mb-4">Movie Not Found</h2>
+            <h2 className="text-4xl font-semibold mb-4">Actor Not Found</h2>
             <p className="text-lg mb-6 text-center">
-              Sorry, we couldn’t find the movie you were looking for. <br />
-              Try searching again or browse popular movies.
+              Sorry, we couldn’t find the actor you were looking for. <br />
+              Try searching again or browse popular actors.
             </p>
             <Link
               to="/"
