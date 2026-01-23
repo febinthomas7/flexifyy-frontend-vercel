@@ -12,6 +12,7 @@ import ScrollForCastAndCrew from "../../components/ScrollForCastAndCrew";
 import DownloadFilesForMovies from "../../components/DownloadFilesForMovies";
 import axios from "axios";
 import Genres from "../../Genre.json";
+import { IoCloudOutline } from "react-icons/io5";
 
 const MovieDetails = () => {
   const { id } = useParams();
@@ -137,11 +138,7 @@ const MovieDetails = () => {
         ></iframe>
       </div>
       <div onClick={() => setIsOpen(!isOpen)}>
-        {isOpen ? (
-          <RxCross1 className="text-white absolute right-5 sm:right-10 top-10 text-[35px] sm:text-[40px] cursor-pointer" />
-        ) : (
-          <IoReorderThreeOutline className="text-white absolute right-5 sm:right-10 top-10 text-[35px] sm:text-[40px] cursor-pointer" />
-        )}
+        <IoCloudOutline className="text-white absolute right-5 sm:right-10 top-10 text-[35px] sm:text-[40px] cursor-pointer" />
       </div>
       {isOpen && (
         <div className="absolute right-5 bg-[#000000] top-20 z-10 w-[250px] p-4 shadow-2xl rounded-md  overflow-hidden">
@@ -172,96 +169,58 @@ const MovieDetails = () => {
       )}
 
       <div
-        className={`absolute bottom-0 bg-black z-10 w-full shadow-2xl rounded-md h-full
-    transition-transform duration-300 ease-out
-    ${isDetailsOpen ? "translate-y-0" : "translate-y-[96%]"}
-  `}
+        className={`absolute flex justify-center items-center bottom-0 z-10 w-full shadow-2xl  rounded-md h-full transition-transform duration-300 ease-out ${isDetailsOpen ? "translate-y-20" : "translate-y-[96%]"}`}
       >
-        {" "}
         <div
           onClick={() => setIsDetailsOpen(!isDetailsOpen)}
-          className="flex justify-center bg-[#940000] w-full items-center z-10  absolute top-0"
+          className="flex justify-center bg-[#940000] w-full max-w-[800px] items-center z-10 rounded-t-full absolute top-0"
         >
           {isDetailsOpen ? (
-            <RxDoubleArrowDown className="text-white p-2  text-[35px] sm:text-[40px] cursor-pointer" />
+            <RxDoubleArrowDown className="text-white p-2 text-[35px] sm:text-[40px] cursor-pointer" />
           ) : (
-            <RxDoubleArrowUp className="text-white  p-2  text-[35px] sm:text-[40px] cursor-pointer" />
+            <RxDoubleArrowUp className="text-white p-2 text-[35px] sm:text-[40px] cursor-pointer" />
           )}
         </div>
-        <div className="h-full w-full pt-16 p-4 overflow-auto">
-          <div className="  flex flex-col gap-6  overflow-hidden  bg-[#000000f4] rounded  relative">
+        <div className="h-full w-full max-w-[800px] bg-black mt-20 pb-28 p-4 overflow-auto">
+          <div className="flex flex-col gap-6 mr-auto overflow-hidden bg-[#000000f4] rounded relative">
             <div className="w-full h-[420px] relative ">
-              {data?.thumbnail ||
-              (mode || type || data?.media_type || data?.mode || data?.type) ==
-                "anime" ? (
-                <img
-                  className="w-full h-full object-cover "
-                  id="backdrop"
-                  onError={(e) => {
-                    e.target.src = "/fallback_bg.png";
-                  }}
-                  src={data?.thumbnail || data?.backdrop_path}
-                  alt={data?.title || data?.name}
-                />
-              ) : (
-                <img
-                  className="w-full h-full object-cover "
-                  id="backdrop"
-                  onError={(e) => {
-                    e.target.src = "/fallback_bg.png";
-                  }}
-                  src={`https://image.tmdb.org/t/p/w500/${data?.backdrop_path}`}
-                  alt={data?.title || data?.name}
-                />
-              )}
-
+              <img
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  e.target.src = "/fallback_bg.png";
+                }}
+                src={
+                  data?.thumbnail ||
+                  (data?.backdrop_path
+                    ? `https://image.tmdb.org/t/p/w500/${data.backdrop_path}`
+                    : "/fallback_bg.png")
+                }
+                alt={data?.title || data?.name}
+              />
               <div className="absolute bottom-0 p-4">
-                <h1 className=" font-extrabold text-[20px] sm:text-[30px] invert drop-shadow-lg">
+                <h1 className="font-extrabold text-[20px] sm:text-[30px] invert drop-shadow-lg">
                   {data?.title || data?.name}
                 </h1>
-
-                <div className="text-white  w-full flex flex-wrap gap-2">
-                  {data?.genres?.map((e, index) => {
-                    const genreName =
-                      Genres.find((g) => g.id === e.id)?.name || "";
-                    return (
-                      <h1
-                        key={index}
-                        className="before:content-['.'] text-[10px]"
-                      >
-                        {genreName}
-                      </h1>
-                    );
-                  })}
+                <div className="text-white w-full flex flex-wrap gap-2">
+                  {data?.genres?.map((e, index) => (
+                    <h1
+                      key={index}
+                      className="before:content-['.'] text-[10px]"
+                    >
+                      {Genres.find((g) => g.id === e.id)?.name || ""}
+                    </h1>
+                  ))}
                 </div>
               </div>
-
-              {seeTrailer &&
-                trailerKey?.length > 0 &&
-                trailerKey.map((e) => {
-                  // Set the source URL conditionally based on the type
-                  let videoSrc = "";
-                  if (e.type === "Trailer" || e.type === "Teaser") {
-                    videoSrc = `https://www.youtube.com/embed/${e.key}`;
-                  } else {
-                    videoSrc = `https://www.youtube.com/embed/${
-                      e?.key || e[0]?.key
-                    }`;
-                  }
-
-                  return (
-                    <iframe
-                      key={e.key || e[0]?.key}
-                      type="text/html"
-                      className="w-full h-full object-contain absolute top-0"
-                      src={videoSrc}
-                      frameBorder="0"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                      referrerPolicy="strict-origin-when-cross-origin"
-                      allowFullScreen
-                    ></iframe>
-                  );
-                })}
+              {seeTrailer && trailerKey?.length > 0 && (
+                <iframe
+                  title="trailer"
+                  className="w-full h-full object-contain absolute top-0"
+                  src={`https://www.youtube.com/embed/${trailerKey[0]?.key}`}
+                  frameBorder="0"
+                  allowFullScreen
+                ></iframe>
+              )}
             </div>
             <div className="w-full px-3">
               <button
@@ -270,30 +229,27 @@ const MovieDetails = () => {
               >
                 Trailer{" "}
                 {seeTrailer ? (
-                  <FaPause className=" group-hover:scale-105" />
+                  <FaPause className="group-hover:scale-105" />
                 ) : (
                   <FaPlay className="group-hover:scale-105" />
                 )}
               </button>
             </div>
-
             <div className="p-3">
               <p className="text-gray-500 text-justify text-sm">
-                {" "}
-                <span className="text-white">Description: </span>
+                <span className="text-white">Description: </span>{" "}
                 {data?.overview}
               </p>
             </div>
             {(data?.media_type || data?.mode || data?.type || mode || type) ==
               "movie" && <DownloadFilesForMovies id={data?.id} />}
-
-            {credits?.cast.length != 0 && !data?.thumbnail ? (
+            {credits?.cast?.length > 0 && !data?.thumbnail && (
               <ScrollForCastAndCrew
                 data={credits}
                 loading={creditsLoading}
                 heading={"cast"}
               />
-            ) : null}
+            )}
           </div>
         </div>
       </div>
