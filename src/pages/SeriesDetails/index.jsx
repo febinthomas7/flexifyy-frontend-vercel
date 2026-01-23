@@ -7,7 +7,7 @@ import {
 import { HiOutlineArrowSmallLeft } from "react-icons/hi2";
 import { Helmet } from "react-helmet";
 import { ToastContainer } from "react-toastify";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { RxCross1, RxDoubleArrowUp, RxDoubleArrowDown } from "react-icons/rx";
 import { IoCloudOutline } from "react-icons/io5";
 import { useQuery } from "@tanstack/react-query";
@@ -22,7 +22,7 @@ const SeriesDetails = () => {
   const location = useLocation();
   const navigation = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-
+  const isInternalUpdate = useRef(false);
   const season = searchParams.get("season") || "1";
   const episode = searchParams.get("episode") || "1";
 
@@ -37,17 +37,13 @@ const SeriesDetails = () => {
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [details, setDetails] = useState(false);
 
-  // --- PROGRESS TRACKING & AUTO-NEXT BRIDGE ---
   useEffect(() => {
     const handleMessage = (event) => {
       try {
         if (!event.data) return;
-
-        // The player sends a string, so we parse it as your documentation shows
         const payload =
           typeof event.data === "string" ? JSON.parse(event.data) : event.data;
 
-        // 1. Verify it is a PLAYER_EVENT
         if (payload.type === "PLAYER_EVENT") {
           const {
             event: playerEvent,
@@ -55,27 +51,29 @@ const SeriesDetails = () => {
             episode: msgEpisode,
           } = payload.data;
 
-          console.log(`Player Status: ${playerEvent} | Ep: ${msgEpisode}`);
+          // When player starts next episode internally (play/timeupdate/ended)
+          if (playerEvent === "play" || playerEvent === "timeupdate") {
+            const newEp = String(msgEpisode);
+            const newSea = String(msgSeason || season);
 
-          // 2. Trigger URL update ONLY when the video ends
-          if (playerEvent === "ended") {
-            const nextEpisodeNumber = Number(msgEpisode) + 1;
-
-            // Update the URL to the next episode
-            setSearchParams({
-              season: String(msgSeason || season),
-              episode: String(nextEpisodeNumber),
-            });
+            // If the player is on a different episode than the URL
+            if (newEp !== episode) {
+              isInternalUpdate.current = true; // BLOCK the iframe refresh
+              setSearchParams(
+                { season: newSea, episode: newEp },
+                { replace: true },
+              );
+            }
           }
         }
       } catch (e) {
-        // Ignore parsing errors from other sources (like React DevTools)
+        /* ignore */
       }
     };
 
     window.addEventListener("message", handleMessage);
     return () => window.removeEventListener("message", handleMessage);
-  }, [season, setSearchParams]);
+  }, [season, episode, setSearchParams]);
 
   const servers = [
     {
@@ -99,6 +97,13 @@ const SeriesDetails = () => {
 
   // Automatically switch iframe source when URL changes
   useEffect(() => {
+    // If change came from message listener, do nothing to the iframe
+    if (isInternalUpdate.current) {
+      isInternalUpdate.current = false;
+      return;
+    }
+
+    // If change came from manual click, reload the iframe
     const savedIdx = localStorage.getItem("serverIndex") || 0;
     setServer(servers[savedIdx]?.url);
   }, [season, episode]);
@@ -187,7 +192,7 @@ const SeriesDetails = () => {
             {servers?.map((item, index) => (
               <li
                 key={index}
-                className={`p-2 cursor-pointer text-sm ${item.url === server ? "bg-blue-600 text-white" : "text-gray-400 hover:bg-gray-800"}`}
+                className={`p-2 cursor-pointer text-sm ${index == localStorage.getItem("serverIndex") ? "bg-blue-600 text-white" : "text-gray-400 hover:bg-gray-800"}`}
                 onClick={() => {
                   setServer(item.url);
                   localStorage.setItem("serverIndex", index);
