@@ -16,13 +16,13 @@ import ScrollForCastAndCrew from "../../components/ScrollForCastAndCrew";
 import axios from "axios";
 import Genres from "../../Genre.json";
 import { MdFormatListBulleted } from "react-icons/md";
+
 const SeriesDetails = () => {
   const { id } = useParams();
   const location = useLocation();
   const navigation = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // Get current values from URL or default to 1
   const season = searchParams.get("season") || "1";
   const episode = searchParams.get("episode") || "1";
 
@@ -33,34 +33,71 @@ const SeriesDetails = () => {
   const [creditsLoading, setCreditsLoading] = useState(true);
   const [selectedSeason, setSelectedSeason] = useState(season);
   const [episodes, setEpisodes] = useState([]);
+  const [isOpen, setIsOpen] = useState(false);
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [details, setDetails] = useState(false);
 
-  // Defined inside component to stay reactive to season/episode changes
+  // --- PROGRESS TRACKING & AUTO-NEXT BRIDGE ---
+  useEffect(() => {
+    const handleMessage = (event) => {
+      try {
+        if (!event.data) return;
+
+        // The player sends a string, so we parse it as your documentation shows
+        const payload =
+          typeof event.data === "string" ? JSON.parse(event.data) : event.data;
+
+        // 1. Verify it is a PLAYER_EVENT
+        if (payload.type === "PLAYER_EVENT") {
+          const {
+            event: playerEvent,
+            season: msgSeason,
+            episode: msgEpisode,
+          } = payload.data;
+
+          console.log(`Player Status: ${playerEvent} | Ep: ${msgEpisode}`);
+
+          // 2. Trigger URL update ONLY when the video ends
+          if (playerEvent === "ended") {
+            const nextEpisodeNumber = Number(msgEpisode) + 1;
+
+            // Update the URL to the next episode
+            setSearchParams({
+              season: String(msgSeason || season),
+              episode: String(nextEpisodeNumber),
+            });
+          }
+        }
+      } catch (e) {
+        // Ignore parsing errors from other sources (like React DevTools)
+      }
+    };
+
+    window.addEventListener("message", handleMessage);
+    return () => window.removeEventListener("message", handleMessage);
+  }, [season, setSearchParams]);
+
   const servers = [
     {
       name: "Server 1",
-      url: `https://vidsrc.xyz/embed/tv?tmdb=${id}&season=${season}&episode=${episode}`,
+      url: `https://vidsrc.xyz/embed/tv?tmdb=${id}&season=${season}&episode=${episode}&autoplay=1&autonext=1`,
     },
     {
       name: "Server 2",
-      url: `https://www.2embed.cc/embedtv/${id}&s=${season}&e=${episode}`,
+      url: `https://www.vidking.net/embed/tv/${id}/${season}/${episode}?autoPlay=true&nextEpisode=true`,
     },
     {
       name: "Server 3",
-      url: `https://www.vidking.net/embed/tv/${id}/${season}/${episode}?autoPlay=true&nextEpisode=true&episodeSelector=true`,
+      url: `https://www.2embed.cc/embedtv/${id}&s=${season}&e=${episode}&autonext=1`,
     },
   ];
 
-  // Initialize server based on stored index preference
   const [server, setServer] = useState(() => {
     const savedIdx = localStorage.getItem("serverIndex") || 0;
     return servers[savedIdx]?.url || servers[0].url;
   });
 
-  const [isOpen, setIsOpen] = useState(false);
-  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
-  const [details, setDetails] = useState(false);
-
-  // Sync server URL when season or episode changes in the URL
+  // Automatically switch iframe source when URL changes
   useEffect(() => {
     const savedIdx = localStorage.getItem("serverIndex") || 0;
     setServer(servers[savedIdx]?.url);
@@ -81,7 +118,6 @@ const SeriesDetails = () => {
     staleTime: 300000,
   });
 
-  // Fetch episodes when selected season changes
   useEffect(() => {
     if (!selectedSeason || !id) return;
     fetch(
@@ -91,11 +127,9 @@ const SeriesDetails = () => {
       .then((res) => setEpisodes(res.episodes || []));
   }, [selectedSeason, id]);
 
-  // Credits & Trailer fetching
   useEffect(() => {
     if (!data?.id) return;
     const commonParams = { id: data.id, mode };
-
     axios
       .get(`${import.meta.env.VITE_BASE_URL}/api/credits`, {
         params: commonParams,
@@ -103,15 +137,12 @@ const SeriesDetails = () => {
       .then((res) => {
         setCredits(res.data);
         setCreditsLoading(false);
-      })
-      .catch(console.error);
-
+      });
     axios
       .get(`${import.meta.env.VITE_BASE_URL}/api/trailer`, {
         params: commonParams,
       })
-      .then((res) => setTrailerKey(res.data))
-      .catch(console.error);
+      .then((res) => setTrailerKey(res.data));
   }, [data?.id]);
 
   const goBack = () => {
@@ -119,27 +150,25 @@ const SeriesDetails = () => {
     document.body.classList.remove("scroll");
   };
 
-  // Sync local selectedSeason state with URL search params
   useEffect(() => {
     if (season) setSelectedSeason(season);
   }, [season]);
 
   return (
-    <div className="w-full h-screen bg-[#000000f4] flex flex-col gap-4 overflow-hidden  items-center justify-center  bg-no-repeat bg-center  p-6 relative bg-[url('/bgImage.svg')]">
+    <div className="w-full h-screen bg-[#000000f4] flex flex-col gap-4 overflow-hidden items-center justify-center bg-no-repeat bg-center p-6 relative bg-[url('/bgImage.svg')]">
       <Helmet>
         <title>Flexifyy</title>
-        <meta name="description" content="watch series" />
       </Helmet>
       <ToastContainer />
 
       <HiOutlineArrowSmallLeft
         onClick={goBack}
-        className="text-white absolute left-5 sm:left-10 top-10 text-[35px] sm:text-[40px] cursor-pointer"
+        className="text-white absolute left-5 top-10 text-[40px] cursor-pointer"
       />
 
-      <div className="w-full h-[500px] md:h-[700px] sm:w-[80%] sm:h-[600px]  shadow-2xl  rounded-md overflow-hidden bg-[#17171784]">
+      <div className="w-full h-[500px] md:h-[700px] sm:w-[80%] sm:h-[600px] shadow-2xl rounded-md overflow-hidden bg-[#17171784]">
         <iframe
-          className="w-full h-full   rounded-md"
+          className="w-full h-full rounded-md"
           src={server}
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
           referrerPolicy="strict-origin-when-cross-origin"
@@ -148,24 +177,21 @@ const SeriesDetails = () => {
       </div>
 
       <div onClick={() => setIsOpen(!isOpen)}>
-        <IoCloudOutline className="text-white absolute right-5 sm:right-10 top-10 text-[35px] sm:text-[40px] cursor-pointer" />
+        <IoCloudOutline className="text-white absolute right-5 top-10 text-[40px] cursor-pointer" />
       </div>
 
       {isOpen && (
-        <div className="absolute right-5 bg-[#000000] top-20 z-10 w-[250px] p-4 shadow-2xl rounded-md  overflow-hidden">
-          <h2 className="text-white font-bold text-sm ">Select Server</h2>
-          <ul className="flex flex-col list-disc">
+        <div className="absolute right-5 bg-black top-20 z-10 w-[250px] p-4 shadow-2xl rounded-md">
+          <h2 className="text-white font-bold text-sm mb-2">Select Server</h2>
+          <ul className="flex flex-col">
             {servers?.map((item, index) => (
               <li
                 key={index}
-                className={`flex items-center w-full h-10 p-2 cursor-pointer ${
-                  item.url === server
-                    ? "bg-blue-500 text-white"
-                    : "text-gray-400"
-                } hover:bg-gray-700 transition duration-200`}
+                className={`p-2 cursor-pointer text-sm ${item.url === server ? "bg-blue-600 text-white" : "text-gray-400 hover:bg-gray-800"}`}
                 onClick={() => {
                   setServer(item.url);
                   localStorage.setItem("serverIndex", index);
+                  setIsOpen(false);
                 }}
               >
                 {item.name}
@@ -177,78 +203,52 @@ const SeriesDetails = () => {
 
       <div onClick={() => setDetails(!details)}>
         {details ? (
-          <RxCross1 className="text-white absolute right-5 sm:right-10 top-20 text-[35px] sm:text-[40px] cursor-pointer" />
+          <RxCross1 className="text-white absolute right-5 top-20 text-[40px] cursor-pointer" />
         ) : (
-          <MdFormatListBulleted className="text-white absolute right-5 sm:right-10 top-20 text-[35px] sm:text-[40px] cursor-pointer" />
+          <MdFormatListBulleted className="text-white absolute right-5 top-20 text-[40px] cursor-pointer" />
         )}
       </div>
 
       {details && (
-        <div className="w-1/2 bg-[#000000] p-4 rounded-md absolute top-32 z-10 right-0 mr-10 shadow-2xl">
-          <h1 className="text-white font-bold text-lg mb-4">Details</h1>
+        <div className="w-1/2 bg-black p-4 rounded-md absolute top-32 z-10 right-0 mr-10 shadow-2xl border border-gray-800">
+          <h1 className="text-white font-bold text-lg mb-4">Episodes</h1>
+          <select
+            className="bg-neutral-900 text-white w-full p-2 mb-4 rounded"
+            value={selectedSeason}
+            onChange={(e) => {
+              setSelectedSeason(e.target.value);
+              setSearchParams({ season: e.target.value, episode: 1 });
+            }}
+          >
+            {data?.seasons?.map((s) => (
+              <option key={s.id} value={s.season_number}>
+                Season {s.season_number}
+              </option>
+            ))}
+          </select>
 
-          {mode === "tv" && (
-            <>
-              <div className="mb-4">
-                <label className="text-gray-400 text-sm block mb-1">
-                  Select Season
-                </label>
-                <select
-                  className="border border-gray-800 rounded p-2 cursor-pointer bg-black text-white w-full"
-                  value={selectedSeason || ""}
-                  onChange={(e) => {
-                    const seasonValue = e.target.value;
-                    setSelectedSeason(seasonValue);
-                    setSearchParams({ season: seasonValue, episode: 1 });
-                  }}
-                >
-                  <option value="" disabled>
-                    Choose season
-                  </option>
-                  {data?.seasons?.map((s) => (
-                    <option key={s.id} value={s.season_number}>
-                      Season {s.season_number}
-                    </option>
-                  ))}
-                </select>
+          <div className="space-y-3 max-h-[420px] overflow-auto pr-2">
+            {episodes.map((ep) => (
+              <div
+                key={ep.id}
+                onClick={() =>
+                  setSearchParams({
+                    season: selectedSeason,
+                    episode: ep.episode_number,
+                  })
+                }
+                className={`border border-gray-800 rounded p-2 cursor-pointer transition ${Number(episode) === Number(ep.episode_number) ? "bg-[#111] border-red-600" : "hover:bg-[#111]"}`}
+              >
+                <h2 className="text-white text-sm font-semibold">
+                  E{ep.episode_number} • {ep.name}
+                </h2>
               </div>
-
-              {episodes.length > 0 && (
-                <div className="space-y-3 max-h-[420px] overflow-auto pr-2">
-                  {episodes.map((ep) => (
-                    <div
-                      key={ep.id}
-                      onClick={() =>
-                        setSearchParams({
-                          season: selectedSeason,
-                          episode: ep.episode_number,
-                        })
-                      }
-                      className={`border border-gray-800 rounded p-2 cursor-pointer transition ${
-                        Number(episode) === ep.episode_number
-                          ? "bg-[#111] border-red-600"
-                          : "hover:bg-[#111]"
-                      }`}
-                    >
-                      <h2 className="text-white text-sm font-semibold cursor-pointer hover:underline">
-                        E{ep.episode_number} • {ep.name}
-                      </h2>
-                      <p className="text-gray-400 text-xs mt-1 line-clamp-3">
-                        {ep.overview || "No description available"}
-                      </p>
-                      <div className="text-[10px] text-gray-500 mt-1">
-                        Runtime: {ep.runtime || "N/A"} min • Air: {ep.air_date}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </>
-          )}
+            ))}
+          </div>
         </div>
       )}
 
-      {/* BOTTOM DRAWER (SAME UI) */}
+      {/* METADATA DRAWER */}
       <div
         className={`absolute flex justify-center items-center bottom-0 z-10 w-full shadow-2xl  rounded-md h-full transition-transform duration-300 ease-out ${isDetailsOpen ? "translate-y-20" : "translate-y-[96%]"}`}
       >
@@ -322,6 +322,8 @@ const SeriesDetails = () => {
                 {data?.overview}
               </p>
             </div>
+            {(data?.media_type || data?.mode || data?.type || mode || type) ==
+              "movie" && <DownloadFilesForMovies id={data?.id} />}
             {credits?.cast?.length > 0 && !data?.thumbnail && (
               <ScrollForCastAndCrew
                 data={credits}
