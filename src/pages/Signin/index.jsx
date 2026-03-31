@@ -61,7 +61,7 @@ const Signin = () => {
                 "Content-Type": "application/json",
               },
               body: JSON.stringify({ email, name }),
-            }
+            },
           );
 
           const emailResult = await emailResponse.json();

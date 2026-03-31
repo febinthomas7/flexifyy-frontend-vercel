@@ -1,13 +1,13 @@
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet";
-import ScrollComponent from "../../components/ScrollComponent";
 import axios from "axios";
 import Footer from "../../components/Footer";
 import { ToastContainer } from "react-toastify";
 import { HiOutlineArrowSmallLeft } from "react-icons/hi2";
 import { LoadingComponentForMovieAndSeries } from "../../components/LoadingComponent";
 import Card from "../../components/Card";
+import MoreInfoComponent from "../../components/MoreInfoComponent";
 
 const Person = () => {
   const { id } = useParams();
@@ -26,6 +26,10 @@ const Person = () => {
   const [cast, setCaste] = useState();
   const [loading, setLoading] = useState(false);
   const [showAll, setShowAll] = useState(false);
+  const [moreInfo, setMoreInfo] = useState(false);
+  const [moreInfoData, setMoreInfoData] = useState();
+  const [type, setType] = useState();
+  const [mode, setMode] = useState();
 
   useEffect(() => {
     document.body.classList.remove("scroll");
@@ -70,6 +74,22 @@ const Person = () => {
       });
   }, [id]);
 
+  const MoreInfo = (e, movie) => {
+    e.stopPropagation();
+    setMoreInfo(true);
+    document.body.classList.add("scroll");
+    setType(movie?.media_type);
+    setMode(movie?.media_type);
+    setMoreInfoData(movie);
+
+    document.getElementById("backdrop").scrollIntoView();
+  };
+  const closeinfo = (e) => {
+    e.stopPropagation();
+    setMoreInfo(false);
+    document.body.classList.remove("scroll");
+  };
+
   return (
     <div className="bg-black">
       <Helmet>
@@ -83,6 +103,15 @@ const Person = () => {
       <ToastContainer />
 
       {/* <Header /> */}
+      {moreInfo && (
+        <MoreInfoComponent
+          closeinfo={closeinfo}
+          type={type}
+          mode={mode}
+          moreInfoData={moreInfoData}
+          MoreInfo={MoreInfo}
+        />
+      )}
 
       <div className="pt-[80px] sm:pt-[110px]">
         <div className="max-w-4xl mx-auto p-4 bg-[#0b0b0b] text-white rounded-lg shadow-md ">
