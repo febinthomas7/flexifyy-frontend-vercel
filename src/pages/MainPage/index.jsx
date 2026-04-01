@@ -5,7 +5,7 @@ import FallBack2 from "../../components/FallBack2";
 
 const MainPage = () => {
   return (
-    <div className=" w-full h-svh flex justify-center items-center bg-black bg-cover bg-no-repeat bg-[url('/mainpage_bg.jpg')] backdrop-blur-sm">
+    <div className=" w-full h-svh flex justify-center items-center bg-black bg-cover bg-no-repeat bg-[url('/mainpage_bg.jpg')] ">
       <Helmet>
         <title>Flexifyy</title>
         <meta
@@ -23,19 +23,19 @@ const MainPage = () => {
       >
         <Link to="/">
           <div className="logo   flex justify-center items-center">
-            {/* <img src="/logo.png" alt="" className="w-[110px] sm:w-[180px] " /> */}
+            {/* <img src="/logo2.png" alt="" className="w-[60px] sm:w-[100px] mt-4 " /> */}
             <FallBack2 />
           </div>
         </Link>
 
-        <Link to="/signin">
+        <Link to="/signup">
           <div className=" flex justify-center items-center cursor-pointer px-4 py-2 bg-red-700 group hover:scale-105 duration-75 ease-in  rounded">
-            Sign In
+            Sign Up
           </div>
         </Link>
       </header>
-      <div className="flex justify-center items-center h-full w-full z-40 backdrop-blur-sm">
-        <div className=" p-8 rounded-lg shadow-lg w-full flex flex-col gap-3 sm:gap-6 text-white justify-center items-center relative">
+      <div className="flex justify-center items-center h-full w-full z-40 ">
+        <div className=" p-8 rounded-lg  w-full flex flex-col gap-3 sm:gap-6 text-white justify-center items-center relative">
           <h2 className="text-2xl sm:text-5xl font-extrabold text-center ">
             Unlimited movies, TV shows and more
           </h2>
@@ -46,7 +46,7 @@ const MainPage = () => {
             Ready to watch? Enter your email to create or restart your
             membership.
           </h3>
-          <Link to="/signin">
+          <Link to="/signup">
             <button className=" relative flex justify-center items-center cursor-pointer px-6 py-2 bg-red-700 group duration-75 ease-in   hover:scale-105 rounded">
               Get Started
               <MdKeyboardArrowRight className="text-[30px] absolute invisible translate-x-[-5px] group-hover:translate-x-0 duration-75 ease-in-out group-hover:right-0 group-hover:visible" />

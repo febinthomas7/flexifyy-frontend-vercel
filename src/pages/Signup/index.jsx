@@ -7,7 +7,7 @@ import { GoEye, GoEyeClosed } from "react-icons/go";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import FallBack2 from "../../components/FallBack2";
 
-const Signin = () => {
+const Signup = () => {
   const navigate = useNavigate();
   const [isBtn, setIsBtn] = useState(false);
   const [pswd, setPswd] = useState(true);
@@ -91,17 +91,17 @@ const Signin = () => {
     }
   };
   return (
-    <div className=" z-10 w-full h-svh flex justify-center items-center  bg-black  bg-no-repeat bg-center bg-cover bg-[url('/mainpage_bg.jpg')] aspect-video ">
+    <div className="w-full h-svh flex justify-center items-center bg-black bg-cover bg-no-repeat bg-[url('/mainpage_bg.jpg')]">
       <Helmet>
-        <title>SignIn - Flexifyy</title>
-        <meta name="description" content="user sign in page" />
+        <title>Sign Up - Flexifyy</title>
+        <meta name="description" content="user sign up page" />
       </Helmet>
-      <div className=" w-full h-svh flex justify-center items-center fixed bg-gradient-to-b from-[#000000ad] via-[#1c1c1c7f] to-[#000000ad] z-10"></div>
+      <div className=" w-full h-svh flex justify-center items-center fixed bg-gradient-to-b from-[#000000ee] via-[#1c1c1c7f] to-black z-10"></div>
       <header
         className={` text-white  sm:px-10 sm:py-2 z-40 flex top-0 justify-between fixed w-full  items-center duration-75 ease-in`}
       ></header>
       <ToastContainer />
-      <div className="flex justify-center h-full items-center w-full z-40 backdrop-blur-sm">
+      <div className="flex justify-center h-full items-center w-full z-40 ">
         <div className="bg-[#000000c0] p-8 rounded-lg shadow-lg w-full max-w-md relative mx-5 ">
           <Link to="/">
             <div className="logo   flex justify-center items-center">
@@ -175,7 +175,7 @@ const Signin = () => {
                   )}
                 </>
               ) : (
-                "Sign In"
+                "Sign Up"
               )}
             </button>
             <div>
@@ -193,4 +193,4 @@ const Signin = () => {
   );
 };
 
-export default Signin;
+export default Signup;

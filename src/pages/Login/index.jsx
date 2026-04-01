@@ -24,7 +24,7 @@ const Login = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(deviceDetails),
-      }
+      },
     );
     // const data = await response.json();
   };
@@ -100,17 +100,18 @@ const Login = () => {
     }
   };
   return (
-    <div className="z-10 w-full h-svh flex justify-center items-center  bg-black  bg-no-repeat bg-center bg-cover bg-[url('/mainpage_bg.jpg')] aspect-video">
+    <div className="w-full h-svh flex justify-center items-center bg-black bg-cover bg-no-repeat bg-[url('/mainpage_bg.jpg')]">
       <Helmet>
         <title>Login - Flexifyy</title>
         <meta name="description" content="user login page" />
       </Helmet>
-      <div className=" w-full h-svh flex justify-center items-center fixed bg-gradient-to-b from-[#000000ad] via-[#1c1c1c7f] to-[#000000ad] z-10"></div>
+      <div className=" w-full h-svh flex justify-center items-center fixed bg-gradient-to-b from-[#000000ee] via-[#1c1c1c7f] to-black z-10"></div>
+
       <header
         className={` text-white sm:px-10 sm:py-2 z-40 flex top-0 justify-between fixed w-full  items-center duration-75 ease-in`}
       ></header>
       <ToastContainer />
-      <div className="flex justify-center items-center w-full h-full z-40  backdrop-blur-sm">
+      <div className="flex justify-center items-center w-full h-full z-40  ">
         <div className="bg-[#000000c0] p-8 rounded-lg shadow-lg w-full  max-w-md relative mx-5 ">
           <Link to="/">
             <div className="logo   flex justify-center items-center">
@@ -188,8 +189,8 @@ const Login = () => {
             <div>
               <p className="text-gray-400 mt-4">
                 Don't have an account?{" "}
-                <Link to="/signin" className="text-red-700 hover:underline">
-                  Sign In
+                <Link to="/signup" className="text-red-700 hover:underline">
+                  Sign Up
                 </Link>
               </p>
             </div>

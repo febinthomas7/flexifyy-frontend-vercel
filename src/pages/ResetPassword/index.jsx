@@ -21,7 +21,7 @@ function ResetPassword() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email, otp, newPassword }),
-        }
+        },
       );
       const data = await response.json();
 
@@ -41,7 +41,7 @@ function ResetPassword() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen  bg-black bg-cover bg-no-repeat bg-[url('/mainpage_bg.jpg')]">
       <ToastContainer />
-      <div className=" w-full h-svh flex justify-center items-center fixed bg-gradient-to-b from-[#000000cf] via-[#1c1c1c7f] to-[#000000cf] z-10"></div>
+      <div className=" w-full h-svh flex justify-center items-center fixed bg-gradient-to-b from-[#000000ee] via-[#1c1c1c7f] to-black z-10"></div>
       <div className="  shadow-md  z-20 bg-[#000000a7] p-8 rounded-lg w-full max-w-md  mx-5">
         <h2 className="text-2xl font-semibold text-white mb-4">Verify OTP</h2>
         <form onSubmit={handleResetPassword}>

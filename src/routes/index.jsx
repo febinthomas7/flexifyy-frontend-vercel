@@ -1,5 +1,5 @@
-import { Link, createBrowserRouter } from "react-router-dom";
-import { lazy, useState, useEffect, useContext } from "react";
+import { createBrowserRouter } from "react-router-dom";
+import { lazy, useEffect, useContext } from "react";
 import { Navigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import { MessagingContext } from "../MessageContext";
@@ -9,7 +9,7 @@ const MainPage = lazy(() => import("../pages/MainPage"));
 const MovieDetails = lazy(() => import("../pages/MovieDetails"));
 const SeriesDetails = lazy(() => import("../pages/SeriesDetails"));
 const Login = lazy(() => import("../pages/Login"));
-const Signin = lazy(() => import("../pages/Signin"));
+const Signup = lazy(() => import("../pages/Signup"));
 const Home = lazy(() => import("../pages/Home"));
 const Movie = lazy(() => import("../pages/Movie"));
 const Profile = lazy(() => import("../pages/ProfilePage"));
@@ -58,10 +58,10 @@ const router = createBrowserRouter([
     ),
   },
   {
-    path: "/signin",
+    path: "/Signup",
     element: (
       <RefreshHandler>
-        <Signin />
+        <Signup />
       </RefreshHandler>
     ),
   },
