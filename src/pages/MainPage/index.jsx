@@ -19,7 +19,7 @@ const MainPage = () => {
       </Helmet>
       <div className=" w-full h-svh flex justify-center items-center fixed bg-gradient-to-b from-[#000000ee] via-[#1c1c1c7f] to-black z-10"></div>
       <header
-        className={` text-white sm:px-10 px-4 py-4 sm:py-2 z-50 flex top-0 justify-between  fixed w-full  items-center duration-75 ease-in`}
+        className={` text-white sm:pr-10 pr-4 py-4 sm:py-2 z-50 flex top-0 justify-between  fixed w-full  items-center duration-75 ease-in`}
       >
         <Link to="/">
           <div className="logo   flex justify-center items-center">

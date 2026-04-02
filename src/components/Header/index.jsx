@@ -10,7 +10,6 @@ import { CgProfile } from "react-icons/cg";
 import { VscThreeBars } from "react-icons/vsc";
 import { MdLocalMovies } from "react-icons/md";
 import { IoChatboxEllipsesOutline } from "react-icons/io5";
-import { BsEmojiSunglasses } from "react-icons/bs";
 import { LuPersonStanding } from "react-icons/lu";
 
 import { FaTv } from "react-icons/fa";
@@ -26,6 +25,7 @@ const Header = () => {
   const [avatarUrl, setAvatarUrl] = useState("");
   const { profileDelete } = useContext(Watch);
   const navigation = useLocation();
+  let avatar = localStorage.getItem("avatar");
 
   const nav = [
     {
@@ -77,7 +77,7 @@ const Header = () => {
         setSearchResults(response.data);
       });
     }, 500),
-    []
+    [],
   );
 
   const handleInputChange = (e) => {
@@ -114,8 +114,8 @@ const Header = () => {
   }, []);
 
   useEffect(() => {
-    setAvatarUrl(localStorage.getItem("avatar"));
-  }, [localStorage.getItem("avatar"), profileDelete]);
+    setAvatarUrl(avatar);
+  }, [avatar, profileDelete]);
 
   return (
     <>
@@ -130,7 +130,7 @@ const Header = () => {
       )}
 
       <header
-        className={` text-white px-2 sm:px-4 z-40 flex justify-between fixed w-full ${
+        className={` text-white pr-2 sm:pr-4 z-40 flex justify-between fixed w-full ${
           bgcolor ? "bg-[#000000db]" : "bg-[#00000000]"
         } items-center duration-75 ease-in`}
       >

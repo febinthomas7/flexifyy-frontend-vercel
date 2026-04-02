@@ -51,5 +51,6 @@
       "type": "image/png"
     }
   ],
-  "categories": ["entertainment", "video", "movies"]
+  "categories": ["entertainment", "video", "movies"],
+  "display_override": ["window-controls-overlay"]
 }
