@@ -36,7 +36,7 @@ const MainPage = () => {
       </header>
       <div className="flex justify-center items-center h-full w-full z-40 ">
         <div className=" p-8 rounded-lg  w-full flex flex-col gap-3 sm:gap-6 text-white justify-center items-center relative">
-          <h2 className="text-2xl sm:text-5xl font-extrabold text-center ">
+          <h2 className="text-4xl sm:text-7xl font-extrabold text-center ">
             Unlimited movies, TV shows and more
           </h2>
           <h3 className="text-[12px] sm:text-[20px] ">
