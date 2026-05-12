@@ -27,7 +27,7 @@ const MovieDetails = () => {
   const servers = [
     {
       name: "Server 1",
-      url: `https://vidsrc.xyz/embed/movie/${id}`,
+      url: `https://vidsrc-embed.ru/embed/movie/${id}`,
     },
     {
       name: "Server 2",

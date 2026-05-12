@@ -78,7 +78,7 @@ const SeriesDetails = () => {
   const servers = [
     {
       name: "Server 1",
-      url: `https://vidsrc.xyz/embed/tv?tmdb=${id}&season=${season}&episode=${episode}&autoplay=1&autonext=1`,
+      url: `https://vidsrc-embed.ru/embed/tv?tmdb=${id}&season=${season}&episode=${episode}&autoplay=1&autonext=1`,
     },
     {
       name: "Server 2",
