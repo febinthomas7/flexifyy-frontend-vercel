@@ -78,16 +78,23 @@ const SeriesDetails = () => {
   const servers = [
     {
       name: "Server 1",
-      url: `https://vidsrc-embed.ru/embed/tv?tmdb=${id}&season=${season}&episode=${episode}&autoplay=1&autonext=1`,
+      url: `https://vaplayer.ru/embed/tv/${id}/${season}/${episode}?autoplay=true&autonextepisode=true`,
     },
+
     {
       name: "Server 2",
-      url: `https://www.vidking.net/embed/tv/${id}/${season}/${episode}?autoPlay=true&nextEpisode=true`,
+      url: `https://vidsrc.ru/tv/${id}/${season}/${episode}?autoplay=true&autonextepisode=true`,
     },
+    
     {
       name: "Server 3",
       url: `https://www.2embed.cc/embedtv/${id}&s=${season}&e=${episode}&autonext=1`,
     },
+    {
+      name: "Server 4",
+      url: `https://vidapi.xyz/embed/tv/${id}/${season}/${episode}?autonext=1`,
+    },
+
   ];
 
   const [server, setServer] = useState(() => {

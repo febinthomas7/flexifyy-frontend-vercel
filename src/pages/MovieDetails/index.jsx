@@ -27,19 +27,19 @@ const MovieDetails = () => {
   const servers = [
     {
       name: "Server 1",
-      url: `https://vidsrc-embed.ru/embed/movie/${id}`,
+      url: `https://vaplayer.ru/embed/movie/${id}`,
     },
     {
       name: "Server 2",
-      url: `https://www.vidking.net/embed/movie/${id}`,
-    },
-    {
-      name: "Server 3",
       url: `https://www.2embed.cc/embed/${id}`,
     },
     {
+      name: "Server 3",
+      url: `https://vidsrc.ru/movie/${id}`,
+    },
+    {
       name: "Server 4",
-      url: `https://vidapi.xyz/embedmulti/movie/${id}`,
+      url: `https://vidapi.xyz/embed/movie/${id}`,
     },
   ];
   const [server, setServer] = useState(servers[0]?.url);
